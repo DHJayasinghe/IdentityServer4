@@ -83,7 +83,7 @@ namespace IdentityServerHost.Configuration
                         }
                     },
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
-                    AllowedScopes = { "resource1.scope1", "resource2.scope1" }
+                    AllowedScopes = { "resource1.scope1", "resource2.scope1" },
                 },
 
                 ///////////////////////////////////////////
@@ -113,7 +113,7 @@ namespace IdentityServerHost.Configuration
                         "resource1.scope1",
                         "resource2.scope1"
                     },
-                    
+
                     RefreshTokenUsage = TokenUsage.OneTimeOnly,
                     AbsoluteRefreshTokenLifetime = 3600 * 24,
                     SlidingRefreshTokenLifetime = 10,
@@ -180,7 +180,7 @@ namespace IdentityServerHost.Configuration
                         IdentityServerConstants.StandardScopes.Email,
                         "resource1.scope1",
                         "resource2.scope1"
-                    }
+                    },
                 },
 
 

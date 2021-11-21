@@ -9,16 +9,16 @@ namespace IdentityServerHost.Configuration
 {
     public static class ClientsWeb
     {
-        static string[] allowedScopes = 
+        static string[] allowedScopes =
         {
             IdentityServerConstants.StandardScopes.OpenId,
             IdentityServerConstants.StandardScopes.Profile,
             IdentityServerConstants.StandardScopes.Email,
-            "resource1.scope1", 
+            "resource1.scope1",
             "resource2.scope1",
             "transaction"
         };
-        
+
         public static IEnumerable<Client> Get()
         {
             return new List<Client>
@@ -31,11 +31,11 @@ namespace IdentityServerHost.Configuration
                     ClientId = "js_oidc",
                     ClientName = "JavaScript OIDC Client",
                     ClientUri = "http://identityserver.io",
-                    
+
                     AllowedGrantTypes = GrantTypes.Code,
                     RequireClientSecret = false,
-                    
-                    RedirectUris = 
+
+                    RedirectUris =
                     {
                         "https://localhost:44300/index.html",
                         "https://localhost:44300/callback.html",
@@ -55,7 +55,7 @@ namespace IdentityServerHost.Configuration
                 new Client
                 {
                     ClientId = "mvc.tokenmanagement",
-                    
+
                     ClientSecrets =
                     {
                         new Secret("secret".Sha256())
@@ -83,22 +83,16 @@ namespace IdentityServerHost.Configuration
                     ClientId = "mvc.code",
                     ClientName = "MVC Code Flow",
                     ClientUri = "http://identityserver.io",
-
-                    ClientSecrets =
-                    {
-                        new Secret("secret".Sha256())
-                    },
-
-                    RequireConsent = true,
+                    RequireConsent = false,
+                    RequireClientSecret = false,
+                    RequirePkce = true,
                     AllowedGrantTypes = GrantTypes.Code,
-
-                    RedirectUris = { "https://localhost:44302/signin-oidc" },
-                    FrontChannelLogoutUri = "https://localhost:44302/signout-oidc",
-                    PostLogoutRedirectUris = { "https://localhost:44302/signout-callback-oidc" },
-
+                    RedirectUris = { "http://localhost:4200" },
+                    FrontChannelLogoutUri = "http://localhost:4200/signout-oidc",
+                    PostLogoutRedirectUris = { "http://localhost:4200/signout-oidc" },
                     AllowOfflineAccess = true,
-
-                    AllowedScopes = allowedScopes
+                    AllowedScopes = allowedScopes,
+                    AllowedCorsOrigins = {"http://localhost:4200"},
                 },
                 
                 ///////////////////////////////////////////
