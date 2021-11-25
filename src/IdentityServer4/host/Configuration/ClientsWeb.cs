@@ -93,6 +93,23 @@ namespace IdentityServerHost.Configuration
                     AllowOfflineAccess = true,
                     AllowedScopes = allowedScopes,
                     AllowedCorsOrigins = {"http://localhost:4200"},
+                    RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                },
+                new Client
+                {
+                    ClientId = "mvc.code2",
+                    ClientName = "MVC Code Flow",
+                    RequireConsent = false,
+                    RequireClientSecret = false,
+                    RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                    ClientSecrets =
+                    {
+                        new Secret("secret".Sha256())
+                    },
+                    RequirePkce = false,
+                    AllowedGrantTypes = GrantTypes.ResourceOwnerPasswordAndClientCredentials,
+                    AllowOfflineAccess = true,
+                    AllowedScopes = allowedScopes
                 },
                 
                 ///////////////////////////////////////////

@@ -41,7 +41,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns></returns>
         public static IIdentityServerBuilder AddRequiredPlatformServices(this IIdentityServerBuilder builder)
         {
-            builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();            
+            builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddOptions();
             builder.Services.AddSingleton(
                 resolver => resolver.GetRequiredService<IOptions<IdentityServerOptions>>().Value);
@@ -131,7 +131,12 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.AddScoped<IUserSession, DefaultUserSession>();
             builder.Services.AddTransient(typeof(MessageCookie<>));
 
-            builder.Services.AddCors();
+            builder.Services.AddCors(options =>
+                options.AddPolicy(name: "anonymous", builder =>
+                {
+                    builder.WithOrigins("*");
+                    builder.WithMethods("get");
+                }));
             builder.Services.AddTransientDecorator<ICorsPolicyProvider, CorsPolicyProvider>();
 
             return builder;
@@ -212,7 +217,7 @@ namespace Microsoft.Extensions.DependencyInjection
             // optional
             builder.Services.TryAddTransient<ICustomTokenValidator, DefaultCustomTokenValidator>();
             builder.Services.TryAddTransient<ICustomAuthorizeRequestValidator, DefaultCustomAuthorizeRequestValidator>();
-            
+
             return builder;
         }
 
@@ -293,7 +298,7 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.Add(new ServiceDescriptor(typeof(Decorator<TService>), provider =>
                 {
-                    return new DisposableDecorator<TService>((TService)registration.ImplementationFactory(provider));
+                    return new DisposableDecorator<TService>((TService) registration.ImplementationFactory(provider));
                 }, registration.Lifetime));
             }
             else

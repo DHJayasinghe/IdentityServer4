@@ -21,6 +21,8 @@ using IdentityServerHost.Extensions;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.HttpOverrides;
 using IdentityServerHost.Quickstart.UI;
+using Host.Quickstart.Account;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace IdentityServerHost
 {
@@ -38,7 +40,7 @@ namespace IdentityServerHost
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            
+
             // cookie policy to deal with temporary browser incompatibilities
             services.AddSameSiteCookiePolicy();
 
@@ -78,19 +80,36 @@ namespace IdentityServerHost
             //     options.ConfigureDbContext = b => b.UseSqlite(connectionString,
             //         sql => sql.MigrationsAssembly(migrationsAssembly));
             // });
-                
+
+            services.AddScoped<AppSessionStoreService, AppSessionStoreService>();
 
             services.AddExternalIdentityProviders();
 
-            services.AddAuthentication()
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://localhost:5001";
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        NameClaimType = "Id", // map custom "Id" claim to "User.Identity.Name", else User.Identity.Name will retrieve null
+                        ValidateIssuer = true,
+                        ValidateAudience = false,
+                        RequireExpirationTime = false,
+                        ValidateLifetime = true
+                    };
+                })
                 .AddCertificate(options =>
                 {
                     options.AllowedCertificateTypes = CertificateTypes.All;
                     options.RevocationMode = X509RevocationMode.NoCheck;
                 });
-            
+
             services.AddCertificateForwardingForNginx();
-            
+
             services.AddLocalApiAuthentication(principal =>
             {
                 principal.Identities.First().AddClaim(new Claim("additional_claim", "additional_value"));
@@ -103,7 +122,7 @@ namespace IdentityServerHost
         {
             // use this for persisted grants store
             // app.InitializePersistedGrantsStore();
-            
+
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -111,7 +130,7 @@ namespace IdentityServerHost
 
             app.UseCertificateForwarding();
             app.UseCookiePolicy();
-            
+
             app.UseSerilogRequestLogging();
 
             app.UseDeveloperExceptionPage();
@@ -252,7 +271,7 @@ namespace IdentityServerHost
                 {
                     X509Certificate2 clientCertificate = null;
 
-                    if(!string.IsNullOrWhiteSpace(headerValue))
+                    if (!string.IsNullOrWhiteSpace(headerValue))
                     {
                         byte[] bytes = Encoding.UTF8.GetBytes(Uri.UnescapeDataString(headerValue));
                         clientCertificate = new X509Certificate2(bytes);
